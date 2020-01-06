@@ -1,0 +1,1 @@
+kubectl exec -it iistemplate-6df6559446-bcdwq powershell 'get-content -Path C:\inetpub\logs\LogFiles\W3SVC1\u_ex191212.log -wait -tail 1'

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dockerform
+  labels:
+    app: dockerform
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: dockerform
+      labels:
+        app: dockerform
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": windows
+      containers:
+      - name: dockerform
+        image: hiragirachem/aspnameform
+        resources:
+          limits:
+            cpu: 1
+            memory: 800M
+          requests:
+            cpu: .1
+            memory: 300M
+        ports:
+          - containerPort: 80
+  selector:
+    matchLabels:
+      app: dockerform
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dockerform
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 80
+  selector:
+    app: dockerform

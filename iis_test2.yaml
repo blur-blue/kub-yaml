@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iis-ing
+  namespace: iis-ingress
+  labels:
+    app: iis-ing
+spec:
+  replicas: 2
+  template:
+    metadata:
+      name: iis-ing
+      labels:
+        app: iis-ing
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": windows
+      containers:
+      - name: iis-ing
+        image: aspacr.azurecr.io/temp/iis
+        resources:
+          limits:
+            cpu: 1
+            memory: 800M
+          requests:
+            cpu: .1
+            memory: 300M
+        ports:
+          - containerPort: 8080
+  selector:
+    matchLabels:
+      app: iis-ing-svc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iis-ing-svc
+  namespace: iis-ingress
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: iis-ing-ingress
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: iis-ing-svc
+          servicePort: 80

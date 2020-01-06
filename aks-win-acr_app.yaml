@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: acrform
+  labels:
+    app: acrform
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: acrform
+      labels:
+        app: acrform
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": windows
+      containers:
+      - name: acrform
+        image: aspacr.azurecr.io/nameform:v1
+        resources:
+          limits:
+            cpu: 1
+            memory: 800M
+          requests:
+            cpu: .1
+            memory: 300M
+        ports:
+          - containerPort: 80
+  selector:
+    matchLabels:
+      app: acrform
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: acrform
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 80
+  selector:
+    app: acrform
