@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keyvault-winapp
+  labels:
+    app: keyvault-winapp
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: keyvault-winapp
+      labels:
+        app: keyvault-winapp
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": windows
+      containers:
+      - name: keyvault-winapp
+        image: mcr.microsoft.com/dotnet/framework/aspnet
+        resources:
+          limits:
+            cpu: 1
+            memory: 800M
+          requests:
+            cpu: .1
+            memory: 300M
+        ports:
+          - containerPort: 80
+  selector:
+    matchLabels:
+      app: keyvault-winapp
